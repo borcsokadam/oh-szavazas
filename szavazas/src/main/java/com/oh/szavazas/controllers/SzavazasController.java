@@ -26,4 +26,13 @@ public class SzavazasController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HibaUzenetDTO(e.getMessage()));
         }
     }
+
+    @GetMapping(path = "/szavazat")
+    public ResponseEntity<?> getSzavazat(@RequestParam Long szavazas, @RequestParam String kepviselo) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(szavazasService.get(szavazas, kepviselo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HibaUzenetDTO(e.getMessage()));
+        }
+    }
 }
