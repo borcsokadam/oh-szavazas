@@ -21,7 +21,7 @@ public class SzavazasController {
     @PostMapping(path = "/szavazas")
     public ResponseEntity<?> saveSzavazas(@RequestBody Szavazas szavazas) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(szavazasService.save(szavazas));
+            return ResponseEntity.status(HttpStatus.CREATED).body(szavazasService.saveSzavazas(szavazas));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HibaUzenetDTO(e.getMessage()));
         }
@@ -30,7 +30,16 @@ public class SzavazasController {
     @GetMapping(path = "/szavazat")
     public ResponseEntity<?> getSzavazat(@RequestParam Long szavazas, @RequestParam String kepviselo) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(szavazasService.get(szavazas, kepviselo));
+            return ResponseEntity.status(HttpStatus.OK).body(szavazasService.getSzavazat(szavazas, kepviselo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HibaUzenetDTO(e.getMessage()));
+        }
+    }
+
+    @GetMapping(path = "/eredmenyek/{szavazasId}")
+    public ResponseEntity<?> getEredmenyek(@PathVariable Long szavazasId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(szavazasService.getEredmenyek(szavazasId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HibaUzenetDTO(e.getMessage()));
         }
