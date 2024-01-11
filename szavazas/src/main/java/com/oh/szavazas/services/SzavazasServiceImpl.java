@@ -7,9 +7,7 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import com.oh.szavazas.dtos.EredmenyekResponseDTO;
-import com.oh.szavazas.dtos.SzavazasResponseDTO;
-import com.oh.szavazas.dtos.SzavazatResponseDTO;
+import com.oh.szavazas.dtos.*;
 import com.oh.szavazas.models.Szavazas;
 import com.oh.szavazas.models.Szavazat;
 import com.oh.szavazas.repositories.SzavazasRepository;
@@ -31,7 +29,7 @@ public class SzavazasServiceImpl implements SzavazasService {
     }
 
     @Override
-    public SzavazasResponseDTO saveSzavazas(Szavazas szavazas) {
+    public SzavazasIdResponseDTO saveSzavazas(Szavazas szavazas) {
         jsonEllenorzes(szavazas);
         if (!kepviseloEgySzavazat(szavazas)) {
             throw new RuntimeException("Egy kepviselonek egy szavazata lehet!");
@@ -43,18 +41,18 @@ public class SzavazasServiceImpl implements SzavazasService {
             throw new RuntimeException("Ebben az idopontban mar tortent szavazas!");
         }
         Szavazas savedSzavazas = szavazasRepository.save(szavazas);
-        return new SzavazasResponseDTO(savedSzavazas.getId());
+        return new SzavazasIdResponseDTO(savedSzavazas.getId());
     }
 
     @Override
-    public SzavazatResponseDTO getSzavazat(Long szavazas, String kepviselo) {
+    public SzavazatErtekResponseDTO getSzavazat(Long szavazas, String kepviselo) {
         Optional<Szavazas> aktualisSzavazas = szavazasRepository.findById(szavazas);
         if (aktualisSzavazas.isEmpty()) {
             throw new RuntimeException("Nincs ilyen id-val szavazas!");
         }
         for (Szavazat szavazat : aktualisSzavazas.get().getSzavazatok()) {
             if (szavazat.getKepviselo().equals(kepviselo)) {
-                return new SzavazatResponseDTO(szavazat.getSzavazat());
+                return new SzavazatErtekResponseDTO(szavazat.getSzavazat());
             }
         }
         throw new RuntimeException("Nem szavazott a megadott kepviselo ezen a szavazason!");
@@ -87,6 +85,18 @@ public class SzavazasServiceImpl implements SzavazasService {
             return new EredmenyekResponseDTO(igenekSzama > kepviselokSzama/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
         }
         return new EredmenyekResponseDTO(igenekSzama > osszesKepviselo/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
+    }
+
+    @Override
+    public SzavazasokResponseDTO getNapiSzavazasok(String adottNap) {
+        SzavazasokResponseDTO szavazasokResponseDTO = new SzavazasokResponseDTO();
+        for (Szavazas szavazas : szavazasRepository.findAll()) {
+            SzavazasResponseDTO szavazasResponseDTO = new SzavazasResponseDTO(szavazas, getEredmenyek(szavazas.getId()));
+            if (szavazas.getIdopont().contains(adottNap)) {
+                szavazasokResponseDTO.addSzavazas(szavazasResponseDTO);
+            }
+        }
+        return szavazasokResponseDTO;
     }
 
     private boolean kepviseloEgySzavazat(Szavazas szavazas) {
