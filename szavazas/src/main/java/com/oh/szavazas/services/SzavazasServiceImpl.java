@@ -1,5 +1,6 @@
 package com.oh.szavazas.services;
 
+import com.ethlo.time.DateTime;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static java.lang.Math.round;
 
 @Service
 public class SzavazasServiceImpl implements SzavazasService {
@@ -97,6 +99,36 @@ public class SzavazasServiceImpl implements SzavazasService {
             }
         }
         return szavazasokResponseDTO;
+    }
+
+    @Override
+    public AtlagResponseDTO getKepviseloAtlagReszvetel(String idoszakKezdete, String idoszakVege) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date idoszakKezdeteDate = null;
+        Date idoszakVegeDate = null;
+        try {
+            idoszakKezdeteDate = simpleDateFormat.parse(idoszakKezdete);
+            idoszakVegeDate = simpleDateFormat.parse(idoszakVege);
+        } catch (Exception e) {
+            throw new RuntimeException("Nem megfelelo idopont formatum!");
+        }
+        double szavazasokSzama = 0;
+        Set<String> kepviselok = new HashSet<>();
+        for (Szavazas szavazas : szavazasRepository.findAll()) {
+            Date szavazasIdopontDate = null;
+            try {
+                szavazasIdopontDate = simpleDateFormat.parse(szavazas.getIdopont());
+            } catch (Exception e) {
+                throw new RuntimeException("Nem megfelelo idopont formatum!");
+            }
+            if (szavazasIdopontDate.after(idoszakKezdeteDate) && szavazasIdopontDate.before(idoszakVegeDate) && !szavazas.getTipus().equals("j")) {
+                szavazasokSzama++;
+                for (Szavazat szavazat : szavazas.getSzavazatok()) {
+                    kepviselok.add(szavazat.getKepviselo());
+                }
+            }
+        }
+        return new AtlagResponseDTO(Math.round((szavazasokSzama/kepviselok.size()) * 100.0) / 100.0);
     }
 
     private boolean kepviseloEgySzavazat(Szavazas szavazas) {
