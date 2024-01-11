@@ -7,6 +7,7 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import com.oh.szavazas.dtos.EredmenyekResponseDTO;
 import com.oh.szavazas.dtos.SzavazasResponseDTO;
 import com.oh.szavazas.dtos.SzavazatResponseDTO;
 import com.oh.szavazas.models.Szavazas;
@@ -30,7 +31,7 @@ public class SzavazasServiceImpl implements SzavazasService {
     }
 
     @Override
-    public SzavazasResponseDTO save(Szavazas szavazas) {
+    public SzavazasResponseDTO saveSzavazas(Szavazas szavazas) {
         jsonEllenorzes(szavazas);
         if (!kepviseloEgySzavazat(szavazas)) {
             throw new RuntimeException("Egy kepviselonek egy szavazata lehet!");
@@ -46,7 +47,7 @@ public class SzavazasServiceImpl implements SzavazasService {
     }
 
     @Override
-    public SzavazatResponseDTO get(Long szavazas, String kepviselo) {
+    public SzavazatResponseDTO getSzavazat(Long szavazas, String kepviselo) {
         Optional<Szavazas> aktualisSzavazas = szavazasRepository.findById(szavazas);
         if (aktualisSzavazas.isEmpty()) {
             throw new RuntimeException("Nincs ilyen id-val szavazas!");
@@ -57,6 +58,35 @@ public class SzavazasServiceImpl implements SzavazasService {
             }
         }
         throw new RuntimeException("Nem szavazott a megadott kepviselo ezen a szavazason!");
+    }
+
+    @Override
+    public EredmenyekResponseDTO getEredmenyek(Long szavazasId) {
+        Optional<Szavazas> aktualisSzavazas = szavazasRepository.findById(szavazasId);
+        if (aktualisSzavazas.isEmpty()) {
+            throw new RuntimeException("Nincs ilyen id-val szavazas!");
+        }
+        int igenekSzama = 0;
+        int nemekSzama = 0;
+        int tartozkodasokSzama = 0;
+        int kepviselokSzama = aktualisSzavazas.get().getSzavazatok().size();
+        int osszesKepviselo = 200;
+        for (Szavazat szavazat : aktualisSzavazas.get().getSzavazatok()) {
+            if (szavazat.getSzavazat().equals("i")) {
+                igenekSzama++;
+            } else if(szavazat.getSzavazat().equals("n")) {
+                nemekSzama++;
+            } else {
+                tartozkodasokSzama++;
+            }
+        }
+        String szavazatTipus = aktualisSzavazas.get().getTipus();
+        if (szavazatTipus.equals("j")) {
+            return new EredmenyekResponseDTO("F", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
+        } else if(szavazatTipus.equals("e")) {
+            return new EredmenyekResponseDTO(igenekSzama > kepviselokSzama/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
+        }
+        return new EredmenyekResponseDTO(igenekSzama > osszesKepviselo/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
     }
 
     private boolean kepviseloEgySzavazat(Szavazas szavazas) {
