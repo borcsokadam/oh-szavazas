@@ -45,6 +45,20 @@ public class SzavazasServiceImpl implements SzavazasService {
         return new SzavazasResponseDTO(savedSzavazas.getId());
     }
 
+    @Override
+    public SzavazatResponseDTO get(Long szavazas, String kepviselo) {
+        Optional<Szavazas> aktualisSzavazas = szavazasRepository.findById(szavazas);
+        if (aktualisSzavazas.isEmpty()) {
+            throw new RuntimeException("Nincs ilyen id-val szavazas!");
+        }
+        for (Szavazat szavazat : aktualisSzavazas.get().getSzavazatok()) {
+            if (szavazat.getKepviselo().equals(kepviselo)) {
+                return new SzavazatResponseDTO(szavazat.getSzavazat());
+            }
+        }
+        throw new RuntimeException("Nem szavazott a megadott kepviselo ezen a szavazason!");
+    }
+
     private boolean kepviseloEgySzavazat(Szavazas szavazas) {
         StringBuilder kepviselok = new StringBuilder();
         List<Szavazat> szavazatok = szavazas.getSzavazatok();

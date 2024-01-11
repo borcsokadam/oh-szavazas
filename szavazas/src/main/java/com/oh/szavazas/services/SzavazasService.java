@@ -6,4 +6,5 @@ import com.oh.szavazas.models.Szavazas;
 
 public interface SzavazasService {
     SzavazasResponseDTO save(Szavazas szavazas);
+    SzavazatResponseDTO get(Long szavazas, String kepviselo);
 }
