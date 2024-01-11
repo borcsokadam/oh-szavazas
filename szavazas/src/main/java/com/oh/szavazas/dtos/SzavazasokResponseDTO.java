@@ -1,7 +1,5 @@
 package com.oh.szavazas.dtos;
 
-import com.oh.szavazas.models.Szavazas;
-
 import java.util.ArrayList;
 import java.util.List;
 

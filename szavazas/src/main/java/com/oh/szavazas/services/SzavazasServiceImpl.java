@@ -1,6 +1,5 @@
 package com.oh.szavazas.services;
 
-import com.ethlo.time.DateTime;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static java.lang.Math.round;
 
 @Service
 public class SzavazasServiceImpl implements SzavazasService {
@@ -74,7 +71,7 @@ public class SzavazasServiceImpl implements SzavazasService {
         for (Szavazat szavazat : aktualisSzavazas.get().getSzavazatok()) {
             if (szavazat.getSzavazat().equals("i")) {
                 igenekSzama++;
-            } else if(szavazat.getSzavazat().equals("n")) {
+            } else if (szavazat.getSzavazat().equals("n")) {
                 nemekSzama++;
             } else {
                 tartozkodasokSzama++;
@@ -83,10 +80,10 @@ public class SzavazasServiceImpl implements SzavazasService {
         String szavazatTipus = aktualisSzavazas.get().getTipus();
         if (szavazatTipus.equals("j")) {
             return new EredmenyekResponseDTO("F", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
-        } else if(szavazatTipus.equals("e")) {
-            return new EredmenyekResponseDTO(igenekSzama > kepviselokSzama/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
+        } else if (szavazatTipus.equals("e")) {
+            return new EredmenyekResponseDTO(igenekSzama > kepviselokSzama / 2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
         }
-        return new EredmenyekResponseDTO(igenekSzama > osszesKepviselo/2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
+        return new EredmenyekResponseDTO(igenekSzama > osszesKepviselo / 2 ? "F" : "U", kepviselokSzama, igenekSzama, nemekSzama, tartozkodasokSzama);
     }
 
     @Override
@@ -128,7 +125,7 @@ public class SzavazasServiceImpl implements SzavazasService {
                 }
             }
         }
-        return new AtlagResponseDTO(Math.round((szavazasokSzama/kepviselok.size()) * 100.0) / 100.0);
+        return new AtlagResponseDTO(Math.round((szavazasokSzama / kepviselok.size()) * 100.0) / 100.0);
     }
 
     private boolean kepviseloEgySzavazat(Szavazas szavazas) {

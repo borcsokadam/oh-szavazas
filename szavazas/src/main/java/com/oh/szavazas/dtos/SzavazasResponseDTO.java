@@ -1,11 +1,7 @@
 package com.oh.szavazas.dtos;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.oh.szavazas.models.Szavazas;
 import com.oh.szavazas.models.Szavazat;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
