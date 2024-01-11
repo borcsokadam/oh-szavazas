@@ -44,4 +44,9 @@ public class SzavazasController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HibaUzenetDTO(e.getMessage()));
         }
     }
+
+    @GetMapping(path = "/napi-szavazasok/{adottNap}")
+    public ResponseEntity<?> getEredmenyek(@PathVariable String adottNap) {
+        return ResponseEntity.status(HttpStatus.OK).body(szavazasService.getNapiSzavazasok(adottNap));
+    }
 }
