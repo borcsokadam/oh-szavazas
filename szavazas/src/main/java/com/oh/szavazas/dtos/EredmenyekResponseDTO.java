@@ -7,6 +7,14 @@ public class EredmenyekResponseDTO {
     private Integer nemekSzama;
     private Integer tartozkodasokSzama;
 
+    public EredmenyekResponseDTO(String eredmeny, Integer kepviselokSzama, Integer igenekSzama, Integer nemekSzama, Integer tartozkodasokSzama) {
+        this.eredmeny = eredmeny;
+        this.kepviselokSzama = kepviselokSzama;
+        this.igenekSzama = igenekSzama;
+        this.nemekSzama = nemekSzama;
+        this.tartozkodasokSzama = tartozkodasokSzama;
+    }
+
     public String getEredmeny() {
         return eredmeny;
     }
